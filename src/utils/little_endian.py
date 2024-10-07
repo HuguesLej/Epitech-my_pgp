@@ -16,3 +16,13 @@ def little_endian_hex_to_standard(hex_str):
 def little_endian_bytes_to_standard(byte_array):
     """Convert a little-endian byte array to a standard byte array."""
     return byte_array[::-1]
+
+def to_little_endian_hex(number):
+    """Convert a number to little-endian hexadecimal format."""
+    hex_str = format(number, 'x')
+
+    if len(hex_str) % 2 != 0:
+        hex_str = '0' + hex_str
+
+    little_endian_bytes = bytes.fromhex(hex_str)[::-1]
+    return little_endian_bytes.hex()
