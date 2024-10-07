@@ -1,5 +1,7 @@
 import sys
 import algo.xor as xor
+import algo.rsa as rsa
+import algo.pgp_xor as pgp_xor
 
 def parse_arguments():
     if len(sys.argv) < 3:
@@ -19,7 +21,7 @@ def parse_arguments():
         print_usage()
         sys.exit(1)
     
-    if mode == 'g':
+    if mode == '-g':
         return {
             'CRYPTO_SYSTEM': crypto_system,
             'MODE': mode,
@@ -76,11 +78,9 @@ def choose_crypto_system(args, message):
         print("AES not implemented yet.")
         return None
     elif args['CRYPTO_SYSTEM'] == 'rsa':
-        print("RSA not implemented yet.")
-        return None
+        return rsa.rsa_encrypt_decrypt(message, args)
     elif args['CRYPTO_SYSTEM'] == 'pgp-xor':
-        print("PGP-XOR not implemented yet.")
-        return None
+        return pgp_xor.pgp_rsa_xor(message, args)
     elif args['CRYPTO_SYSTEM'] == 'pgp-aes':
         print("PGP-AES not implemented yet.")
         return None
