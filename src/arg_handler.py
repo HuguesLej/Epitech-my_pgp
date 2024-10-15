@@ -24,6 +24,16 @@ def parse_arguments():
         sys.exit(84)
     
     if mode == '-g':
+        if crypto_system != 'rsa':
+            print("Erreur : Le mode -g n'est disponible que pour RSA.")
+            print_usage()
+            sys.exit(84)
+
+        if len(sys.argv) < 5:
+            print("Erreur : Le mode -g requiert deux arguments P et Q.")
+            print_usage()
+            sys.exit(84)
+
         return {
             'CRYPTO_SYSTEM': crypto_system,
             'MODE': mode,
