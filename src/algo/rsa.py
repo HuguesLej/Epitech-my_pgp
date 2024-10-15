@@ -33,7 +33,7 @@ def generate_key(p, q):
             break
     
     if e is None:
-        raise ValueError("No valid Fermat prime found for e")
+        exit(84)
     
     d = mod_inverse(e, phi)
 
@@ -45,6 +45,20 @@ def generate_key(p, q):
     
     return public_key, private_key
 
+def is_prime(n):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
 # Fonction principale pour la gestion des opérations RSA : génération, chiffrement, et déchiffrement
 def rsa_encrypt_decrypt(message, args):
 
@@ -52,6 +66,8 @@ def rsa_encrypt_decrypt(message, args):
 
         p = int(args['OPTIONS']['P'], 16)
         q = int(args['OPTIONS']['Q'], 16)
+        if not is_prime(p) or not is_prime(q):
+            exit(84)
         generate_key(p, q)
 
     elif args['MODE'] == '-c':
