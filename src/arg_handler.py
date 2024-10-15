@@ -6,7 +6,8 @@ import src.algo.rsa as rsa
 import src.algo.pgp_xor as pgp_xor
 
 def parse_arguments():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 3 or len(sys.argv) > 5:
+        print("Erreur : Nombre d'arguments incorrect.")
         print_usage()
         sys.exit(84)
 
@@ -24,12 +25,13 @@ def parse_arguments():
         sys.exit(84)
     
     if mode == '-g':
+
         if crypto_system != 'rsa':
             print("Erreur : Le mode -g n'est disponible que pour RSA.")
             print_usage()
             sys.exit(84)
 
-        if len(sys.argv) < 5:
+        if len(sys.argv) != 5:
             print("Erreur : Le mode -g requiert deux arguments P et Q.")
             print_usage()
             sys.exit(84)
@@ -43,18 +45,23 @@ def parse_arguments():
                 'Q': sys.argv[4]
             }
         }
-        
+
 
     use_block = False
     key = None
 
-    for arg in sys.argv[3:]:
-        if arg == '-b':
-            use_block = True
-        elif key is None:
-            key = arg
+    if len(sys.argv) == 5:
+        if sys.argv[3] != '-b':
+            print(f"Erreur: Option '{sys.argv[3]}' non valide.")
+            print_usage()
+            sys.exit(84)
 
-    if mode in ['-c', '-d'] and key is None:
+        use_block = True
+        key = sys.argv[4]
+    elif len(sys.argv) == 4:
+        key = sys.argv[3]
+
+    if key is None:
         print("Erreur : Une clé est requise pour les modes -c et -d.")
         print_usage()
         sys.exit(84)
