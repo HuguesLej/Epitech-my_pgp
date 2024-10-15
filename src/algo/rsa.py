@@ -40,8 +40,8 @@ def generate_key(p, q):
     public_key = little_endian.to_little_endian_hex(e) + '-' + little_endian.to_little_endian_hex(n)
     private_key = little_endian.to_little_endian_hex(d) + '-' + little_endian.to_little_endian_hex(n)
 
-    print(f"Public key: {public_key}")
-    print(f"Private key: {private_key}")
+    print(f"public key: {public_key}")
+    print(f"private key: {private_key}")
     
     return public_key, private_key
 
