@@ -16,7 +16,7 @@ def parse_arguments():
     if crypto_system not in ['xor', 'aes', 'rsa', 'pgp-xor', 'pgp-aes']:
         print(f"Erreur : CRYPTO_SYSTEM '{crypto_system}' non valide.")
         print_usage()
-        sys.exit(1)
+        sys.exit(84)
 
     if mode not in ['-c', '-d', '-g']:
         print(f"Erreur : MODE '{mode}' non valide.")
