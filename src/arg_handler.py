@@ -58,7 +58,7 @@ def parse_arguments():
 
         use_block = True
         key = sys.argv[4]
-    else:
+    elif len(sys.argv) == 4:
         key = sys.argv[3]
 
     if key is None:
