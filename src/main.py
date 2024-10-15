@@ -1,5 +1,7 @@
+#!/usr/bin/python3
+
 import sys
-import arg_handler as argparse
+import src.arg_handler as argparse
 
 if __name__ == "__main__":
     args = argparse.parse_arguments()

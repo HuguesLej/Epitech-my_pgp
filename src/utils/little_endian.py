@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 def hex_to_little_endian_bytes(hex_str):
     """Convert a hex string to bytes in little-endian order."""
     bytes_array = bytes.fromhex(hex_str)

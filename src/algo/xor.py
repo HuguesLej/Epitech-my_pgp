@@ -1,4 +1,6 @@
-import utils.little_endian as little_endian
+#!/usr/bin/python3
+
+import src.utils.little_endian as little_endian
 
 def xor_encrypt_decrypt(message, args):
     key_hex = args['OPTIONS']['key']

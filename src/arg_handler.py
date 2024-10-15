@@ -1,7 +1,9 @@
+#!/usr/bin/python3
+
 import sys
-import algo.xor as xor
-import algo.rsa as rsa
-import algo.pgp_xor as pgp_xor
+import src.algo.xor as xor
+import src.algo.rsa as rsa
+import src.algo.pgp_xor as pgp_xor
 
 def parse_arguments():
     if len(sys.argv) < 3:

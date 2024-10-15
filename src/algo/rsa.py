@@ -1,6 +1,8 @@
+#!/usr/bin/python3
+
 from math import gcd  # Importation de la fonction PGCD (Greatest Common Divisor)
 from random import randrange  # Pour générer des nombres aléatoires (non utilisé ici)
-import utils.little_endian as little_endian  # Module pour la conversion en little-endian
+import src.utils.little_endian as little_endian  # Module pour la conversion en little-endian
 
 # Fonction pour calculer l'inverse modulaire de 'e' modulo 'phi'
 def egcd(a, b):
