@@ -21,7 +21,7 @@ def parse_arguments():
     if mode not in ['-c', '-d', '-g']:
         print(f"Erreur : MODE '{mode}' non valide.")
         print_usage()
-        sys.exit(1)
+        sys.exit(84)
     
     if mode == '-g':
         return {
@@ -47,7 +47,7 @@ def parse_arguments():
     if mode in ['-c', '-d'] and key is None:
         print("Erreur : Une clé est requise pour les modes -c et -d.")
         print_usage()
-        sys.exit(1)
+        sys.exit(84)
 
     return {
         'CRYPTO_SYSTEM': crypto_system,
