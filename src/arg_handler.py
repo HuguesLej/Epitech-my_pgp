@@ -8,7 +8,7 @@ import src.algo.pgp_xor as pgp_xor
 def parse_arguments():
     if len(sys.argv) < 3:
         print_usage()
-        sys.exit(1)
+        sys.exit(84)
 
     crypto_system = sys.argv[1]
     mode = sys.argv[2]
@@ -59,19 +59,25 @@ def parse_arguments():
     }
 
 def print_usage():
-    print("Usage: my_pgp CRYPTO_SYSTEM MODE [OPTIONS] [key]")
-    print("CRYPTO_SYSTEM:")
-    print("  xor    : computation using XOR algorithm")
-    print("  aes    : computation using 128-bit AES algorithm")
-    print("  rsa    : computation using RSA algorithm")
-    print("  pgp-xor: computation using both RSA and XOR algorithm")
-    print("  pgp-aes: computation using both RSA and 128-bit AES algorithm")
-    print("MODE:")
-    print("  -c    : Cipher the MESSAGE")
-    print("  -d    : Decipher the MESSAGE")
-    print("OPTIONS:")
-    print("  -b    : Block mode, MESSAGE and key must be the same size")
-    print("key     : Hexadecimal key used to cipher/decipher MESSAGE")
+    print("USAGE")
+    print("     ./my_pgp CRYPTO_SYSTEM MODE [OPTIONS] [key]")
+    print("")
+    print("  CRYPTO_SYSTEM")
+    print("    \"xor\"        computation using XOR algorithm")
+    print("    \"aes\"        computation using 128-bit AES algorithm")
+    print("    \"rsa\"        computation using RSA algorithm")
+    print("    \"pgp-xor\"    computation using both RSA and XOR algorithm")
+    print("    \"pgp-aes\"    computation using both RSA and 128-bit AES algorithm")
+    print("")
+    print("  MODE")
+    print("    -c           Cipher the MESSAGE")
+    print("    -d           Decipher the MESSAGE")
+    print("    -g P Q       for RSA only: Don't read a MESSAGE, but instead generate a public and private key pair from the prime number P and Q")
+    print("")
+    print("  OPTIONS")
+    print("    -b           for XOR, AES and PGP, only works on one block. The MESSAGE and the symmetric key must be the same size")
+    print("")
+    print("  key        Key used to cipher/decipher MESSAGE (incompatible with -g MODE)")
 
 def choose_crypto_system(args, message):
     if args['CRYPTO_SYSTEM'] == 'xor':
