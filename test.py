@@ -24,18 +24,27 @@ sbox = [
 ]
 
 
-def ListToMatrix(lst: list[int]) -> list[list[int]]:
+def ListToColBasedMatrix(lst: list[int]) -> list[list[int]]:
     return [[lst[col + row * 4] for row in range(4)] for col in range(4)]
 
 
-def MatrixToList(matrix: list[list[int]]) -> list[int]:
+def ColBasedMatrixToList(matrix: list[list[int]]) -> list[int]:
     return [matrix[row][col] for col in range(4) for row in range(4)]
 
 
+def PrintMatrix(matrix: list[list[int]]) -> None:
+    print()
+    print("| Column 0 | Column 1 | Column 2 | Column 3 |")
+    print("|----------|----------|----------|----------|")
+    for row in range(4):
+        print(f"| 0x{matrix[row][0]:02x}     | 0x{matrix[row][1]:02x}     | 0x{matrix[row][2]:02x}     | 0x{matrix[row][3]:02x}     |")
+    print()
+
+
 def AddRoundKey(state: list[list[int]], subKey: list[list[int]]) -> list[list[int]]:
-    for col in range(4):
-        for row in range(4):
-            state[col][row] ^= subKey[col][row]
+    for row in range(4):
+        for col in range(4):
+            state[row][col] ^= subKey[row][col]
     return state
 
 
@@ -48,30 +57,13 @@ def SubWord(word: list[int]) -> list[int]:
 
 
 def ShiftRows(state: list[list[int]]) -> list[list[int]]:
-    # for i in range(1, 4):
-    #     state[i] = state[i][i:] + state[i][:i]
-    # return state
-    # for i in range(1, 4):
-    #     for _ in range(i):
-    #         state[i] = RotWord(state[i])
-    # return state
-    for row in range(4):
+    for row in range(1, 4):
         for _ in range(row):
-            tmp = state[0][row]
-            for col in range(3):
-                state[col][row] = state[col + 1][row]
-            state[3][row] = tmp
+            state[row] = RotWord(state[row])
     return state
 
 
-# Need change after this point
-# Must convert functions to handle column based matrix instead of row based matrix
-
 def SubBytes(state: list[list[int]]) -> list[list[int]]:
-    # for i in range(4):
-    #     for j in range(4):
-    #         state[i][j] = sbox[state[i][j]]
-    # return state
     for i in range(0, 4):
         state[i] = SubWord(state[i])
     return state
@@ -89,8 +81,7 @@ def RCon(word: list[int], i: int) -> list[int]:
     return word
 
 
-# def ExpandKeys(cypher_key: list[int]) -> list[list[int]]:
-def ExpandKeys(cypher_key: list[int]) -> list[list[list[int]]]:
+def ExpandKeys(cypher_key: list[int]) -> list[list[int]]:
     words = [cypher_key[i * 4:(i + 1) * 4] for i in range(4)]
 
     for i in range(4, 44):
@@ -100,42 +91,28 @@ def ExpandKeys(cypher_key: list[int]) -> list[list[list[int]]]:
             temp[0] ^= RCon([0x00] * 4, i // 4)[0]
         words.append([words[i - 4][j] ^ temp[j] for j in range(4)])
 
-    # keys: list[list[int]] = []
-    # for i in range(0, len(words), 4):
-    #     key: list[int] = []
-    #     for j in range(4):
-    #         key.extend(words[i + j])
-    #     keys.append(key)
-    # return keys
-    keys: list[list[list[int]]] = []
+    keys: list[list[int]] = []
     for i in range(0, len(words), 4):
-        key: list[list[int]] = []
+        key: list[int] = []
         for j in range(4):
-            key.append(words[i + j])
+            key.extend(words[i + j])
         keys.append(key)
     return keys
 
 
 if __name__ == "__main__":
-    # cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
+    cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
     # print(f"Cypher key:\n{cypher_key}")
-    # keys = ExpandKeys(cypher_key)
+    keys = ExpandKeys(cypher_key)
     # for i in range(len(keys)):
-    #     print(f"Key {i}:\n{[[hex(byte) for byte in word] for word in keys[i]]}")
-
-    # state = [[0x54, 0x68, 0x65, 0x20], [0x49, 0x72, 0x6f, 0x6e], [0x20, 0x54, 0x68, 0x72], [0x6f, 0x6e, 0x65, 0x2e]]
-    # state = AddRoundKey(state, keys[0])
-    # print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
-    # state = SubBytes(state)
-    # print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
-    # state = ShiftRows(state)
-    # print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
+    #     print(f"Key {i}:\n{[hex(byte) for byte in keys[i]]}")
 
     lst = [0x54, 0x68, 0x65, 0x20, 0x49, 0x72, 0x6f, 0x6e, 0x20, 0x54, 0x68, 0x72, 0x6f, 0x6e, 0x65, 0x2e]
-    print(f"List:\n{[hex(byte) for byte in lst]}")
-    matrix = ListToMatrix(lst)
-    print(f"Matrix:\n{[[hex(byte) for byte in word] for word in matrix]}")
-    matrix = ShiftRows(matrix)
-    print(f"Matrix:\n{[[hex(byte) for byte in word] for word in matrix]}")
+    state = ListToColBasedMatrix(lst)
+    state = AddRoundKey(state, ListToColBasedMatrix(keys[0]))
+    state = SubBytes(state)
+    state = ShiftRows(state)
+    PrintMatrix(state)
+    print(f"State after AddRoundKey:\n{[hex(byte) for byte in ColBasedMatrixToList(state)]}")
 
     exit(0)
