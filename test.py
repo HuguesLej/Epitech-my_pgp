@@ -41,6 +41,18 @@ def PrintMatrix(matrix: list[list[int]]) -> None:
     print()
 
 
+def GaloisMult(a: int, b: int) -> int:
+    res = 0
+    for _ in range(8):
+        if b & 1:
+            res ^= a
+        a <<= 1
+        if a & 0x100:
+            a ^= 0x11b
+        b >>= 1
+    return res
+
+
 def AddRoundKey(state: list[list[int]], subKey: list[list[int]]) -> list[list[int]]:
     for row in range(4):
         for col in range(4):
@@ -66,6 +78,20 @@ def ShiftRows(state: list[list[int]]) -> list[list[int]]:
 def SubBytes(state: list[list[int]]) -> list[list[int]]:
     for i in range(0, 4):
         state[i] = SubWord(state[i])
+    return state
+
+
+def MixColumns(state: list[list[int]]) -> list[list[int]]:
+    for col in range(4):
+        s0 = state[0][col]
+        s1 = state[1][col]
+        s2 = state[2][col]
+        s3 = state[3][col]
+
+        state[0][col] = GaloisMult(0x02, s0) ^ GaloisMult(0x03, s1) ^ s2 ^ s3
+        state[1][col] = s0 ^ GaloisMult(0x02, s1) ^ GaloisMult(0x03, s2) ^ s3
+        state[2][col] = s0 ^ s1 ^ GaloisMult(0x02, s2) ^ GaloisMult(0x03, s3)
+        state[3][col] = GaloisMult(0x03, s0) ^ s1 ^ s2 ^ GaloisMult(0x02, s3)
     return state
 
 
@@ -112,6 +138,8 @@ if __name__ == "__main__":
     state = AddRoundKey(state, ListToColBasedMatrix(keys[0]))
     state = SubBytes(state)
     state = ShiftRows(state)
+    state = MixColumns(state)
+    state = AddRoundKey(state, ListToColBasedMatrix(keys[1]))
     PrintMatrix(state)
     print(f"State after AddRoundKey:\n{[hex(byte) for byte in ColBasedMatrixToList(state)]}")
 
