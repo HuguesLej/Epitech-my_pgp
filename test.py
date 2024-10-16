@@ -128,19 +128,21 @@ def ExpandKeys(cypher_key: list[int]) -> list[list[int]]:
 
 if __name__ == "__main__":
     cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
-    # print(f"Cypher key:\n{cypher_key}")
     keys = ExpandKeys(cypher_key)
-    # for i in range(len(keys)):
-    #     print(f"Key {i}:\n{[hex(byte) for byte in keys[i]]}")
 
     lst = [0x54, 0x68, 0x65, 0x20, 0x49, 0x72, 0x6f, 0x6e, 0x20, 0x54, 0x68, 0x72, 0x6f, 0x6e, 0x65, 0x2e]
     state = ListToColBasedMatrix(lst)
+
     state = AddRoundKey(state, ListToColBasedMatrix(keys[0]))
+    for i in range(9):
+        state = SubBytes(state)
+        state = ShiftRows(state)
+        state = MixColumns(state)
+        state = AddRoundKey(state, ListToColBasedMatrix(keys[i + 1]))
     state = SubBytes(state)
     state = ShiftRows(state)
-    state = MixColumns(state)
-    state = AddRoundKey(state, ListToColBasedMatrix(keys[1]))
+    state = AddRoundKey(state, ListToColBasedMatrix(keys[10]))
     PrintMatrix(state)
-    print(f"State after AddRoundKey:\n{[hex(byte) for byte in ColBasedMatrixToList(state)]}")
+    print(f"{[hex(byte) for byte in ColBasedMatrixToList(state)]}")
 
     exit(0)
