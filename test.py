@@ -25,17 +25,17 @@ sbox = [
 
 
 def ListToMatrix(lst: list[int]) -> list[list[int]]:
-    return [[lst[i + j * 4] for j in range(4)] for i in range(4)]
+    return [[lst[col + row * 4] for row in range(4)] for col in range(4)]
 
 
 def MatrixToList(matrix: list[list[int]]) -> list[int]:
-    return [matrix[i][j] for j in range(4) for i in range(4)]
+    return [matrix[row][col] for col in range(4) for row in range(4)]
 
 
 def AddRoundKey(state: list[list[int]], subKey: list[list[int]]) -> list[list[int]]:
-    for i in range(4):
-        for j in range(4):
-            state[i][j] ^= subKey[i][j]
+    for col in range(4):
+        for row in range(4):
+            state[col][row] ^= subKey[col][row]
     return state
 
 
@@ -44,18 +44,28 @@ def RotWord(word: list[int]) -> list[int]:
 
 
 def SubWord(word: list[int]) -> list[int]:
-    return [sbox[b] for b in word]
+    return [sbox[byte] for byte in word]
 
 
 def ShiftRows(state: list[list[int]]) -> list[list[int]]:
     # for i in range(1, 4):
     #     state[i] = state[i][i:] + state[i][:i]
     # return state
-    for i in range(1, 4):
-        for _ in range(i):
-            state[i] = RotWord(state[i])
+    # for i in range(1, 4):
+    #     for _ in range(i):
+    #         state[i] = RotWord(state[i])
+    # return state
+    for row in range(4):
+        for _ in range(row):
+            tmp = state[0][row]
+            for col in range(3):
+                state[col][row] = state[col + 1][row]
+            state[3][row] = tmp
     return state
 
+
+# Need change after this point
+# Must convert functions to handle column based matrix instead of row based matrix
 
 def SubBytes(state: list[list[int]]) -> list[list[int]]:
     # for i in range(4):
@@ -125,7 +135,7 @@ if __name__ == "__main__":
     print(f"List:\n{[hex(byte) for byte in lst]}")
     matrix = ListToMatrix(lst)
     print(f"Matrix:\n{[[hex(byte) for byte in word] for word in matrix]}")
-    lst = MatrixToList(matrix)
-    print(f"List:\n{[hex(byte) for byte in lst]}")
+    matrix = ShiftRows(matrix)
+    print(f"Matrix:\n{[[hex(byte) for byte in word] for word in matrix]}")
 
     exit(0)
