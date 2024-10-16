@@ -60,24 +60,45 @@ def AddRoundKey(state: list[list[int]], subKey: list[list[int]]) -> list[list[in
     return state
 
 
-def RotWord(word: list[int]) -> list[int]:
+def RotWordLeft(word: list[int]) -> list[int]:
     return [word[1], word[2], word[3], word[0]]
+
+
+def RotWordRight(word: list[int]) -> list[int]:
+    return [word[3], word[0], word[1], word[2]]
 
 
 def SubWord(word: list[int]) -> list[int]:
     return [sbox[byte] for byte in word]
 
 
+def RevSubWord(word: list[int]) -> list[int]:
+    return [sbox.index(byte) for byte in word]
+
+
 def ShiftRows(state: list[list[int]]) -> list[list[int]]:
     for row in range(1, 4):
         for _ in range(row):
-            state[row] = RotWord(state[row])
+            state[row] = RotWordLeft(state[row])
+    return state
+
+
+def RevShiftRows(state: list[list[int]]) -> list[list[int]]:
+    for row in range(1, 4):
+        for _ in range(row):
+            state[row] = RotWordRight(state[row])
     return state
 
 
 def SubBytes(state: list[list[int]]) -> list[list[int]]:
     for i in range(0, 4):
         state[i] = SubWord(state[i])
+    return state
+
+
+def RevSubBytes(state: list[list[int]]) -> list[list[int]]:
+    for i in range(0, 4):
+        state[i] = RevSubWord(state[i])
     return state
 
 
@@ -92,6 +113,20 @@ def MixColumns(state: list[list[int]]) -> list[list[int]]:
         state[1][col] = s0 ^ GaloisMult(0x02, s1) ^ GaloisMult(0x03, s2) ^ s3
         state[2][col] = s0 ^ s1 ^ GaloisMult(0x02, s2) ^ GaloisMult(0x03, s3)
         state[3][col] = GaloisMult(0x03, s0) ^ s1 ^ s2 ^ GaloisMult(0x02, s3)
+    return state
+
+
+def RevMixColumns(state: list[list[int]]) -> list[list[int]]:
+    for col in range(4):
+        s0 = state[0][col]
+        s1 = state[1][col]
+        s2 = state[2][col]
+        s3 = state[3][col]
+
+        state[0][col] = GaloisMult(0x0e, s0) ^ GaloisMult(0x0b, s1) ^ GaloisMult(0x0d, s2) ^ GaloisMult(0x09, s3)
+        state[1][col] = GaloisMult(0x09, s0) ^ GaloisMult(0x0e, s1) ^ GaloisMult(0x0b, s2) ^ GaloisMult(0x0d, s3)
+        state[2][col] = GaloisMult(0x0d, s0) ^ GaloisMult(0x09, s1) ^ GaloisMult(0x0e, s2) ^ GaloisMult(0x0b, s3)
+        state[3][col] = GaloisMult(0x0b, s0) ^ GaloisMult(0x0d, s1) ^ GaloisMult(0x09, s2) ^ GaloisMult(0x0e, s3)
     return state
 
 
@@ -113,7 +148,7 @@ def ExpandKeys(cypher_key: list[int]) -> list[list[int]]:
     for i in range(4, 44):
         temp = words[i - 1]
         if i % 4 == 0:
-            temp = SubWord(RotWord(temp))
+            temp = SubWord(RotWordLeft(temp))
             temp[0] ^= RCon([0x00] * 4, i // 4)[0]
         words.append([words[i - 4][j] ^ temp[j] for j in range(4)])
 
@@ -126,23 +161,52 @@ def ExpandKeys(cypher_key: list[int]) -> list[list[int]]:
     return keys
 
 
-if __name__ == "__main__":
-    cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
-    keys = ExpandKeys(cypher_key)
-
-    lst = [0x54, 0x68, 0x65, 0x20, 0x49, 0x72, 0x6f, 0x6e, 0x20, 0x54, 0x68, 0x72, 0x6f, 0x6e, 0x65, 0x2e]
+def Encrypt(lst: list[int], keys: list[list[int]]) -> list[int]:
     state = ListToColBasedMatrix(lst)
 
     state = AddRoundKey(state, ListToColBasedMatrix(keys[0]))
+
     for i in range(9):
         state = SubBytes(state)
         state = ShiftRows(state)
         state = MixColumns(state)
         state = AddRoundKey(state, ListToColBasedMatrix(keys[i + 1]))
+
     state = SubBytes(state)
     state = ShiftRows(state)
     state = AddRoundKey(state, ListToColBasedMatrix(keys[10]))
-    PrintMatrix(state)
-    print(f"{[hex(byte) for byte in ColBasedMatrixToList(state)]}")
+
+    return ColBasedMatrixToList(state)
+
+
+def Decrypt(lst: list[int], keys: list[list[int]]) -> list[int]:
+    state = ListToColBasedMatrix(lst)
+
+    state = AddRoundKey(state, ListToColBasedMatrix(keys[10]))
+
+    for i in range(9, 0, -1):
+        state = RevShiftRows(state)
+        state = RevSubBytes(state)
+        state = AddRoundKey(state, ListToColBasedMatrix(keys[i]))
+        state = RevMixColumns(state)
+
+    state = RevShiftRows(state)
+    state = RevSubBytes(state)
+    state = AddRoundKey(state, ListToColBasedMatrix(keys[0]))
+
+    return ColBasedMatrixToList(state)
+
+
+if __name__ == "__main__":
+    cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
+    lst = [0x54, 0x68, 0x65, 0x20, 0x49, 0x72, 0x6f, 0x6e, 0x20, 0x54, 0x68, 0x72, 0x6f, 0x6e, 0x65, 0x2e]
+    keys = ExpandKeys(cypher_key)
+
+    encrypt_lst = Encrypt(lst, keys)
+    decrypt_lst = Decrypt(encrypt_lst, keys)
+
+    print(f"Initial list: {[hex(byte) for byte in lst]}")
+    print(f"Encrypt list: {[hex(byte) for byte in encrypt_lst]}")
+    print(f"Decrypt list: {[hex(byte) for byte in decrypt_lst]}")
 
     exit(0)
