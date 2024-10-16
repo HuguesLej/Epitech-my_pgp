@@ -4,6 +4,7 @@ import sys
 import src.algo.xor as xor
 import src.algo.rsa as rsa
 import src.algo.pgp_xor as pgp_xor
+import src.algo.aes as aes
 
 def parse_arguments():
     if len(sys.argv) < 3 or len(sys.argv) > 5:
@@ -100,8 +101,7 @@ def choose_crypto_system(args, message):
     if args['CRYPTO_SYSTEM'] == 'xor':
         return xor.xor_encrypt_decrypt(message, args)
     elif args['CRYPTO_SYSTEM'] == 'aes':
-        print("AES not implemented yet.")
-        return None
+        return aes.aes_encrypt_decrypt(message, args)
     elif args['CRYPTO_SYSTEM'] == 'rsa':
         return rsa.rsa_encrypt_decrypt(message, args)
     elif args['CRYPTO_SYSTEM'] == 'pgp-xor':
