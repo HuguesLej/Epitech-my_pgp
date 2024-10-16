@@ -24,6 +24,14 @@ sbox = [
 ]
 
 
+def ListToMatrix(lst: list[int]) -> list[list[int]]:
+    return [[lst[i + j * 4] for j in range(4)] for i in range(4)]
+
+
+def MatrixToList(matrix: list[list[int]]) -> list[int]:
+    return [matrix[i][j] for j in range(4) for i in range(4)]
+
+
 def AddRoundKey(state: list[list[int]], subKey: list[list[int]]) -> list[list[int]]:
     for i in range(4):
         for j in range(4):
@@ -99,18 +107,25 @@ def ExpandKeys(cypher_key: list[int]) -> list[list[list[int]]]:
 
 
 if __name__ == "__main__":
-    cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
+    # cypher_key = [103, 97, 109, 101, 32, 111, 102, 32, 116, 104, 114, 111, 110, 101, 115, 10]
     # print(f"Cypher key:\n{cypher_key}")
-    keys = ExpandKeys(cypher_key)
+    # keys = ExpandKeys(cypher_key)
     # for i in range(len(keys)):
     #     print(f"Key {i}:\n{[[hex(byte) for byte in word] for word in keys[i]]}")
 
-    state = [[0x54, 0x68, 0x65, 0x20], [0x49, 0x72, 0x6f, 0x6e], [0x20, 0x54, 0x68, 0x72], [0x6f, 0x6e, 0x65, 0x2e]]
-    state = AddRoundKey(state, keys[0])
-    print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
-    state = SubBytes(state)
-    print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
-    state = ShiftRows(state)
-    print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
+    # state = [[0x54, 0x68, 0x65, 0x20], [0x49, 0x72, 0x6f, 0x6e], [0x20, 0x54, 0x68, 0x72], [0x6f, 0x6e, 0x65, 0x2e]]
+    # state = AddRoundKey(state, keys[0])
+    # print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
+    # state = SubBytes(state)
+    # print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
+    # state = ShiftRows(state)
+    # print(f"State:\n{[[hex(byte) for byte in word] for word in state]}")
+
+    lst = [0x54, 0x68, 0x65, 0x20, 0x49, 0x72, 0x6f, 0x6e, 0x20, 0x54, 0x68, 0x72, 0x6f, 0x6e, 0x65, 0x2e]
+    print(f"List:\n{[hex(byte) for byte in lst]}")
+    matrix = ListToMatrix(lst)
+    print(f"Matrix:\n{[[hex(byte) for byte in word] for word in matrix]}")
+    lst = MatrixToList(matrix)
+    print(f"List:\n{[hex(byte) for byte in lst]}")
 
     exit(0)
