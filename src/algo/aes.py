@@ -209,29 +209,23 @@ def Decrypt(lst: list[int], keys: list[list[int]]) -> list[int]:
 
 def aes_encrypt_decrypt(message, args):
     ## WORKS ONLY WITH BLOCK MODE ENABLED
-    ## WORKS ONLY WITH '-c' MODE
-
-    # print("message: ", message)
-    # print("args: ", args)
 
     hex_key = [int(args["OPTIONS"]["key"][i:i + 2], 16) for i in range(0, len(args["OPTIONS"]["key"]), 2)]
-    hex_lst = [ord(char) for char in message]
-
     cypher_key = ListWordsToLittleEndian(hex_key)
-    state_lst = hex_lst
     keys = ExpandKeys(cypher_key)
 
-    # for i in range(len(keys)):
-    #     print(f"key {i}: {[hex(byte) for byte in keys[i]]}")
+    state_lst: list[int]
+    result: str
 
-    encrypted_lst = Encrypt(state_lst, keys)
-    # PrintMatrix(ListToColBasedMatrix(encrypted_lst))
-    # print(f"encrypted_lst: {[hex(byte) for byte in encrypted_lst]}")
-    result = ListWordsToLittleEndian(encrypted_lst)
-    # PrintMatrix(ListToColBasedMatrix(result))
-    # print(f"encrypted_lst: {[hex(byte) for byte in result]}")
-    encrypted_message = "".join([format(byte, "02x") for byte in result])
-    # print("encrypted_message: ", encrypted_message)
+    if args["MODE"] == "-c":
+        state_lst = [ord(char) for char in message]
 
+        encrypted_lst = ListWordsToLittleEndian(Encrypt(state_lst, keys))
+        result = "".join([format(byte, "02x") for byte in encrypted_lst])
+    else:
+        state_lst = ListWordsToLittleEndian([int(message[i:i + 2], 16) for i in range(0, len(message), 2)])
 
-    return encrypted_message
+        decrypted_lst = Decrypt(state_lst, keys)
+        result = "".join([chr(byte) for byte in decrypted_lst])
+
+    return result
