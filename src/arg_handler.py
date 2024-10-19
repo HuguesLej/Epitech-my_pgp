@@ -110,4 +110,4 @@ def choose_crypto_system(args, message):
         print("PGP-AES not implemented yet.")
         return None
     else:
-        exit(1)  
+        exit(84)  

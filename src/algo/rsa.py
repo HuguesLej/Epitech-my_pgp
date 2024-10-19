@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
-from math import gcd  # Importation de la fonction PGCD (Greatest Common Divisor)
-from random import randrange  # Pour générer des nombres aléatoires (non utilisé ici)
-import src.utils.little_endian as little_endian  # Module pour la conversion en little-endian
+from math import gcd
+from random import randrange
+import src.utils.little_endian as little_endian
 
-# Fonction pour calculer l'inverse modulaire de 'e' modulo 'phi'
 def egcd(a, b):
     if a == 0:
         return (b, 0, 1)
@@ -15,13 +14,12 @@ def egcd(a, b):
 def mod_inverse(a, m):
     g, x, y = egcd(a, m)
     if g != 1:
-        raise Exception('modular inverse does not exist')
+        exit(84)
     else:
         return x % m
 
 FERMAT_PRIMES = [65537, 257, 17, 5, 3]
 
-# Fonction pour générer une paire de clés RSA (publique et privée) à partir de deux nombres premiers 'p' et 'q'
 def generate_key(p, q):
     n = p * q
     phi = (p - 1) * (q - 1)
@@ -59,14 +57,16 @@ def is_prime(n):
         i += 6
     return True
 
-# Fonction principale pour la gestion des opérations RSA : génération, chiffrement, et déchiffrement
 def rsa_encrypt_decrypt(message, args):
 
     if args['MODE'] == '-g':
 
         p = int(args['OPTIONS']['P'], 16)
         q = int(args['OPTIONS']['Q'], 16)
+        print(q)
+        print(p)
         if not is_prime(p) or not is_prime(q):
+            print("Erreur: nombres pas premiers")
             exit(84)
         generate_key(p, q)
 
